@@ -1,0 +1,46 @@
+import { createContext, useContext, useState, useEffect } from 'react';
+import { authService } from '../services/superAdminServices';
+
+const AuthContext = createContext();
+
+export const useAuth = () => {
+  const context = useContext(AuthContext);
+  if (!context) {
+    throw new Error('useAuth must be used within AuthProvider');
+  }
+  return context;
+};
+
+export const AuthProvider = ({ children }) => {
+  const [user, setUser] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const storedUser = authService.getStoredUser();
+    if (storedUser && storedUser.role === 'super_admin') {
+      setUser(storedUser);
+    }
+    setLoading(false);
+  }, []);
+
+  const login = async (credentials) => {
+    const data = await authService.login(credentials);
+    setUser(data.user);
+    return data;
+  };
+
+  const logout = () => {
+    authService.logout();
+    setUser(null);
+  };
+
+  const value = {
+    user,
+    isAuthenticated: !!user,
+    loading,
+    login,
+    logout,
+  };
+
+  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
+};
