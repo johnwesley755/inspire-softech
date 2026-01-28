@@ -1,7 +1,5 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import Header from '../components/common/Header';
-import Footer from '../components/common/Footer';
 import Loader from '../components/common/Loader';
 import { useCart } from '../context/CartContext';
 import api from '../services/api';
@@ -48,36 +46,27 @@ const ProductDetail = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex flex-col">
-        <Header />
-        <div className="flex-1 flex items-center justify-center">
-          <Loader size="large" />
-        </div>
-        <Footer />
+      <div className="flex-1 flex items-center justify-center min-h-screen">
+        <Loader size="large" />
       </div>
     );
   }
 
   if (error || !product) {
     return (
-      <div className="min-h-screen flex flex-col">
-        <Header />
-        <div className="flex-1 flex items-center justify-center">
-          <div className="text-center">
-            <p className="text-red-600 text-lg mb-4">{error || 'Product not found'}</p>
-            <button onClick={() => navigate('/products')} className="btn-primary">
-              Back to Products
-            </button>
-          </div>
+      <div className="flex-1 flex items-center justify-center min-h-screen">
+        <div className="text-center">
+          <p className="text-red-600 text-lg mb-4">{error || 'Product not found'}</p>
+          <button onClick={() => navigate('/products')} className="btn-primary">
+            Back to Products
+          </button>
         </div>
-        <Footer />
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen flex flex-col">
-      <main className="flex-1 bg-gray-50 mt-20">
+    <main className="flex-1 bg-gray-50 mt-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           {/* Breadcrumb */}
           <div className="mb-6">
@@ -247,9 +236,6 @@ const ProductDetail = () => {
           </div>
         </div>
       </main>
-
-      <Footer />
-    </div>
   );
 };
 

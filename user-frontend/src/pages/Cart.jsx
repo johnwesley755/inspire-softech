@@ -1,14 +1,21 @@
 import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import Header from '../components/common/Header';
-import Footer from '../components/common/Footer';
 import Loader from '../components/common/Loader';
 import { useCart } from '../context/CartContext';
+import { useAuth } from '../context/AuthContext';
 
 const Cart = () => {
   const navigate = useNavigate();
+  const { user, loading: authLoading } = useAuth();
   const { cart, updateCartItem, removeFromCart, clearCart, loading } = useCart();
   const [updating, setUpdating] = useState({});
+
+  // Redirect to login if not authenticated
+  useEffect(() => {
+    if (!authLoading && !user) {
+      navigate('/login?redirect=/cart');
+    }
+  }, [user, authLoading, navigate]);
 
   const handleUpdateQuantity = async (itemId, newQuantity) => {
     if (newQuantity < 1) return;
@@ -53,21 +60,14 @@ const Cart = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex flex-col">
-        <Header />
-        <div className="flex-1 flex items-center justify-center">
-          <Loader size="large" />
-        </div>
-        <Footer />
+      <div className="flex-1 flex items-center justify-center min-h-screen">
+        <Loader size="large" />
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen flex flex-col">
-      <Header />
-      
-      <main className="flex-1 bg-gray-50">
+    <main className="flex-1 bg-gray-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <h1 className="text-3xl font-bold mb-8">Shopping Cart</h1>
 
@@ -220,9 +220,6 @@ const Cart = () => {
           )}
         </div>
       </main>
-
-      <Footer />
-    </div>
   );
 };
 

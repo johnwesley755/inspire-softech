@@ -1,14 +1,22 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import Header from '../components/common/Header';
-import Footer from '../components/common/Footer';
+import Loader from '../components/common/Loader';
 import { useCart } from '../context/CartContext';
+import { useAuth } from '../context/AuthContext';
 import { orderService } from '../services/orderService';
 import api from '../services/api';
 
 const Checkout = () => {
   const navigate = useNavigate();
   const { cart, clearCart } = useCart();
+  const { user, loading: authLoading } = useAuth();
+  
+  // Redirect to login if not authenticated
+  useEffect(() => {
+    if (!authLoading && !user) {
+      navigate('/login?redirect=/checkout');
+    }
+  }, [user, authLoading, navigate]);
   
   const [formData, setFormData] = useState({
     // Shipping Address
@@ -105,26 +113,20 @@ const Checkout = () => {
 
   if (!cart?.items || cart.items.length === 0) {
     return (
-      <div className="min-h-screen flex flex-col">
-        <Header />
-        <div className="flex-1 flex items-center justify-center">
-          <div className="text-center">
-            <p className="text-xl text-gray-600 mb-4">Your cart is empty</p>
-            <button onClick={() => navigate('/products')} className="btn-primary">
-              Continue Shopping
-            </button>
-          </div>
+      <div className="flex-1 flex items-center justify-center min-h-screen">
+        <div className="text-center">
+          <h2 className="text-2xl font-bold mb-4">Your Cart is Empty</h2>
+          <p className="text-xl text-gray-600 mb-4">Your cart is empty</p>
+          <button onClick={() => navigate('/products')} className="btn-primary">
+            Continue Shopping
+          </button>
         </div>
-        <Footer />
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen flex flex-col">
-      <Header />
-      
-      <main className="flex-1 bg-gray-50">
+    <main className="flex-1 bg-gray-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <h1 className="text-3xl font-bold mb-8">Checkout</h1>
 
@@ -392,9 +394,6 @@ const Checkout = () => {
           </form>
         </div>
       </main>
-
-      <Footer />
-    </div>
   );
 };
 
